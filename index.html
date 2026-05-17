@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Capitals Challenge</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f0e17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Capitals">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="logo">GeoChallenge</div>
+  <div class="tagline">🌍 How well do you know the world?</div>
+
+  <div class="settings-panel">
+    <div class="setting-row">
+      <span class="setting-label">DIFFICULTY</span>
+      <div class="chips">
+        <button class="chip" id="diff-easy"   onclick="setDiff('easy')">Easy</button>
+        <button class="chip active" id="diff-medium" onclick="setDiff('medium')">Medium</button>
+        <button class="chip" id="diff-hard"   onclick="setDiff('hard')">Hard</button>
+      </div>
+    </div>
+    <div id="diff-desc" class="diff-desc"></div>
+    <div class="setting-row">
+      <span class="setting-label">REGION</span>
+      <select class="setting-sel" id="region-sel" onchange="setRegion(this.value)">
+        <option value="all">All regions</option>
+        <option value="Africa">Africa</option>
+        <option value="Americas">Americas</option>
+        <option value="Asia">Asia</option>
+        <option value="Europe">Europe</option>
+        <option value="Oceania">Oceania</option>
+      </select>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">OPTIONS</span>
+      <div class="chips">
+        <button class="chip" id="timer-chip" onclick="toggleTimer()">⏱ Timer</button>
+        <button class="chip active" id="sound-chip" onclick="toggleSound()">🔊 Sound</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mode-cards">
+    <div class="mode-card map-mode" onclick="startGame('map')">
+      <div class="mode-icon">🗺️</div>
+      <h2>Map Click</h2>
+      <p>Find the country on the world map</p>
+    </div>
+    <div class="mode-card type-mode" onclick="startGame('type')">
+      <div class="mode-icon">⌨️</div>
+      <h2>Type Capital</h2>
+      <p>Type the capital city from memory</p>
+    </div>
+    <div class="mode-card mc-mode" onclick="startGame('mc')">
+      <div class="mode-icon">🔤</div>
+      <h2>Multiple Choice</h2>
+      <p>Pick the right capital from 4 options</p>
+    </div>
+    <div class="mode-card rev-mode" onclick="startGame('reverse')">
+      <div class="mode-icon">🔄</div>
+      <h2>Reverse</h2>
+      <p>Given the capital — name the country</p>
+    </div>
+  </div>
+
+  <div class="home-btns">
+    <button class="lb-btn" onclick="showStudy()">📚 Study</button>
+    <button class="lb-btn" onclick="showLB()">🏆 Leaderboard</button>
+  </div>
+</div>
+
+<!-- MAP GAME -->
+<div id="map-game" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">← Home</button>
+    <div class="hud">
+      <div class="hud-item"><div class="hud-label">Score</div><div class="hud-val score" id="ms">0</div></div>
+      <div class="hud-item"><div class="hud-label">Streak</div><div class="hud-val streak" id="mst">0</div></div>
+      <div class="hud-item"><div class="hud-label">Lives</div><div class="hud-val lives" id="ml">❤️❤️❤️</div></div>
+      <div class="hud-item"><div class="hud-label">Q</div><div class="hud-val" id="mq" style="color:var(--blue)">1/20</div></div>
+    </div>
+    <button class="hint-btn" id="mhb" onclick="mapHint()">💡 Hint (<span id="mhl">3</span>)</button>
+  </div>
+  <div id="map-qbar">
+    <div class="ql">Find this country on the map</div>
+    <div class="qt" id="mqt">—</div>
+    <div class="qhint" id="mqh"></div>
+    <button class="skip-btn" id="map-skip" onclick="skipMap()">Skip — show me</button>
+  </div>
+  <div class="timer-wrap" id="map-timer-wrap" style="display:none">
+    <div class="timer-bar" id="map-timer" style="width:100%"></div>
+  </div>
+  <div id="map-wrap">
+    <svg id="msvg" viewBox="0 0 960 500" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="mfb">✓ CORRECT!</div>
+  </div>
+</div>
+
+<!-- TYPE GAME (also Reverse mode) -->
+<div id="type-game" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">← Home</button>
+    <div class="hud">
+      <div class="hud-item"><div class="hud-label">Score</div><div class="hud-val score" id="ts">0</div></div>
+      <div class="hud-item"><div class="hud-label">Streak</div><div class="hud-val streak" id="tst">0</div></div>
+      <div class="hud-item"><div class="hud-label">Lives</div><div class="hud-val lives" id="tl">❤️❤️❤️</div></div>
+      <div class="hud-item"><div class="hud-label">Q</div><div class="hud-val" id="tq" style="color:var(--blue)">1/20</div></div>
+    </div>
+    <button class="hint-btn" id="thb" onclick="typeHint()">💡 Hint (<span id="thl">3</span>)</button>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-bar" id="tprog" style="width:0%"></div>
+  </div>
+  <div class="timer-wrap" id="type-timer-wrap" style="display:none">
+    <div class="timer-bar" id="type-timer" style="width:100%"></div>
+  </div>
+  <div id="type-card">
+    <div id="type-rl" class="rl">What is the capital of…</div>
+    <span class="big-flag" id="tflag">🌍</span>
+    <div class="cname" id="tcname">—</div>
+    <div class="csub" id="tcsub"></div>
+    <div id="type-hint"></div>
+    <div id="type-iw">
+      <input id="type-in" type="text" placeholder="Type your answer…" autocomplete="off"
+        oninput="onTI()" onkeydown="onTK(event)">
+      <div id="ac"></div>
+    </div>
+    <button id="sub-btn" onclick="submitType()">SUBMIT →</button>
+    <button class="skip-btn" id="type-skip" onclick="skipType()">Skip — show answer</button>
+    <div id="type-fb"></div>
+  </div>
+</div>
+
+<!-- MULTIPLE CHOICE GAME -->
+<div id="mc-game" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">← Home</button>
+    <div class="hud">
+      <div class="hud-item"><div class="hud-label">Score</div><div class="hud-val score" id="mcs">0</div></div>
+      <div class="hud-item"><div class="hud-label">Streak</div><div class="hud-val streak" id="mcst">0</div></div>
+      <div class="hud-item"><div class="hud-label">Lives</div><div class="hud-val lives" id="mcl">❤️❤️❤️</div></div>
+      <div class="hud-item"><div class="hud-label">Q</div><div class="hud-val" id="mcq" style="color:var(--blue)">1/20</div></div>
+    </div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-bar" id="mcprog" style="width:0%"></div>
+  </div>
+  <div class="timer-wrap" id="mc-timer-wrap" style="display:none">
+    <div class="timer-bar" id="mc-timer" style="width:100%"></div>
+  </div>
+  <div id="mc-card">
+    <div class="rl">What is the capital of…</div>
+    <span class="big-flag" id="mcflag">🌍</span>
+    <div class="cname" id="mccname">—</div>
+    <div class="csub" id="mccsub"></div>
+    <div id="mc-choices">
+      <button class="mc-choice" id="mc0" onclick="handleMCAnswer(0)"></button>
+      <button class="mc-choice" id="mc1" onclick="handleMCAnswer(1)"></button>
+      <button class="mc-choice" id="mc2" onclick="handleMCAnswer(2)"></button>
+      <button class="mc-choice" id="mc3" onclick="handleMCAnswer(3)"></button>
+    </div>
+    <button class="skip-btn" id="mc-skip" onclick="skipMC()">Skip — show answer</button>
+  </div>
+</div>
+
+<!-- STUDY / BROWSE -->
+<div id="study" class="screen">
+  <div class="study-hdr">
+    <div class="study-top">
+      <button class="back-btn" onclick="goHome()">← Home</button>
+      <h1 class="study-title">📚 Browse &amp; Study</h1>
+    </div>
+    <div class="study-filters">
+      <input id="study-q" class="study-search" type="search" placeholder="Search country or capital…" oninput="renderStudy()">
+      <select id="study-rgn" class="study-rgn-sel" onchange="renderStudy()">
+        <option value="">All regions</option>
+        <option value="Africa">Africa</option>
+        <option value="Americas">Americas</option>
+        <option value="Asia">Asia</option>
+        <option value="Europe">Europe</option>
+        <option value="Oceania">Oceania</option>
+      </select>
+    </div>
+  </div>
+  <div id="study-list"></div>
+</div>
+
+<!-- ROUND END -->
+<div id="rend">
+  <div class="ec">
+    <h2 id="etitle">GAME OVER!</h2>
+    <div class="fs" id="escore">0</div>
+    <div class="fsl">POINTS</div>
+    <div class="srow">
+      <div class="es"><div class="ev" id="ecorr">0</div><div class="el">Correct</div></div>
+      <div class="es"><div class="ev" id="estrk">0</div><div class="el">Best Streak</div></div>
+      <div class="es"><div class="ev" id="emode">—</div><div class="el">Mode</div></div>
+    </div>
+    <div id="review-section">
+      <div class="review-title">Revisit these</div>
+      <div id="review-list"></div>
+    </div>
+    <input id="pname" type="text" placeholder="Your name for the leaderboard" maxlength="20">
+    <div class="ebtns">
+      <button class="ebtn p" onclick="savePlay()">💾 Save &amp; Play Again</button>
+      <button class="ebtn s" onclick="saveHome()">🏆 Leaderboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboard" class="screen">
+  <h1>🏆 Leaderboard</h1>
+  <div id="lbt"></div>
+  <div class="lb-actions">
+    <button class="lbback" onclick="goHome()">← Back</button>
+    <button class="clr" onclick="clearLB()">Clear All</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
