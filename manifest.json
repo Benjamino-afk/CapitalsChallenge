@@ -1,24 +1,29 @@
 {
-  "name": "Capitals Challenge",
-  "short_name": "Capitals",
+  "name": "GeoChallenger",
+  "short_name": "GeoChallenger",
   "description": "Test your world capitals knowledge — click the map or type to win!",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0f0e17",
   "theme_color": "#0f0e17",
-  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "maskable"
+      "purpose": "any"
     }
   ]
 }

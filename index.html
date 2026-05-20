@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Capitals">
-  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -101,7 +101,7 @@
     <div class="timer-bar" id="map-timer" style="width:100%"></div>
   </div>
   <div id="map-wrap">
-    <svg id="msvg" viewBox="0 0 960 500" preserveAspectRatio="xMidYMid meet"></svg>
+    <svg id="msvg"></svg>
     <div id="mfb">✓ CORRECT!</div>
   </div>
 </div>
@@ -221,10 +221,22 @@
 <!-- LEADERBOARD -->
 <div id="leaderboard" class="screen">
   <h1>🏆 Leaderboard</h1>
+  <div class="lb-filters">
+    <div class="lb-filter-group">
+      <button class="lb-chip" id="lbd-easy"   onclick="setLBDiff('easy')">Easy</button>
+      <button class="lb-chip" id="lbd-medium" onclick="setLBDiff('medium')">Medium</button>
+      <button class="lb-chip" id="lbd-hard"   onclick="setLBDiff('hard')">Hard</button>
+    </div>
+    <div class="lb-filter-group">
+      <button class="lb-chip" id="lbm-Map"  onclick="setLBMode('Map')">🗺️ Map</button>
+      <button class="lb-chip" id="lbm-Type" onclick="setLBMode('Type')">⌨️ Type</button>
+      <button class="lb-chip" id="lbm-MC"   onclick="setLBMode('MC')">🔤 MC</button>
+      <button class="lb-chip" id="lbm-Rev"  onclick="setLBMode('Rev')">🔄 Reverse</button>
+    </div>
+  </div>
   <div id="lbt"></div>
   <div class="lb-actions">
     <button class="lbback" onclick="goHome()">← Back</button>
-    <button class="clr" onclick="clearLB()">Clear All</button>
   </div>
 </div>
 

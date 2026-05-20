@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'capitals-static-v2';
+const STATIC_CACHE = 'capitals-static-v3';
 const CDN_CACHE = 'capitals-cdn-v1';
 
 const STATIC_ASSETS = [
@@ -8,6 +8,9 @@ const STATIC_ASSETS = [
   './app.js',
   './manifest.json',
   './icons/icon.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-180.png',
 ];
 
 self.addEventListener('install', e => {
