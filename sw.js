@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'capitals-static-v3';
+const STATIC_CACHE = 'capitals-static-v4';
 const CDN_CACHE = 'capitals-cdn-v1';
 
 const STATIC_ASSETS = [
