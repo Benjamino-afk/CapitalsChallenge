@@ -521,7 +521,15 @@ async function loadMap() {
   // Wait for layout to complete — service worker cache can resolve fetch instantly,
   // before the browser has reflowed the newly-visible flex container
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  const W = wrap.clientWidth, H = wrap.clientHeight || window.innerHeight * 0.7;
+  const rect = wrap.getBoundingClientRect();
+  const W = rect.width || window.innerWidth;
+  const H = rect.height || (window.innerHeight - rect.top);
+  // DEBUG — remove after confirming dimensions are correct
+  const dbg = document.createElement('div');
+  dbg.style.cssText = 'position:fixed;top:60px;left:0;z-index:9999;background:rgba(0,0,0,0.85);color:#ff0;font-size:16px;padding:8px 12px;border-radius:0 8px 8px 0';
+  dbg.textContent = `W=${Math.round(W)} H=${Math.round(H)} cH=${wrap.clientHeight} bH=${Math.round(rect.height)}`;
+  document.body.appendChild(dbg);
+  setTimeout(() => dbg.remove(), 8000);
   // Scale to fill whichever dimension is larger — no letterboxing, minor clipping in Pacific
   const scale = Math.max((H / 500) * 153, (W / 960) * 153);
   const proj = d3.geoNaturalEarth1().scale(scale).translate([W / 2, H / 2]);
