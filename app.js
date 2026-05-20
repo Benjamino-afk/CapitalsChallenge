@@ -530,9 +530,12 @@ async function loadMap() {
   dbg.textContent = `W=${Math.round(W)} H=${Math.round(H)} cH=${wrap.clientHeight} bH=${Math.round(rect.height)}`;
   document.body.appendChild(dbg);
   setTimeout(() => dbg.remove(), 8000);
-  // Scale to fill whichever dimension is larger — no letterboxing, minor clipping in Pacific
-  const scale = Math.max((H / 500) * 153, (W / 960) * 153);
-  const proj = d3.geoNaturalEarth1().scale(scale).translate([W / 2, H / 2]);
+  // fitSize to get correct base scale, then scale up to fill container (no letterboxing)
+  const sphere = { type: 'Sphere' };
+  const proj = d3.geoNaturalEarth1().fitSize([W, H], sphere);
+  const [[x0, y0], [x1, y1]] = d3.geoPath().projection(proj).bounds(sphere);
+  const fill = Math.max(W / (x1 - x0), H / (y1 - y0));
+  proj.scale(proj.scale() * fill).translate([W / 2, H / 2]);
   const path = d3.geoPath().projection(proj);
   mg = msvg.append('g');
   mg.selectAll('path').data(feats).enter().append('path')
@@ -942,7 +945,7 @@ updateHomeSettings();
 (function() {
   const tag = document.createElement('div');
   tag.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:9999;background:rgba(0,0,0,0.7);color:#ff0;font-size:11px;padding:4px 8px;border-radius:6px;pointer-events:none';
-  tag.textContent = 'v=debug4';
+  tag.textContent = 'v=debug7';
   document.body.appendChild(tag);
 })();
 
