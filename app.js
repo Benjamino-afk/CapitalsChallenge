@@ -347,6 +347,7 @@ function stopTimer() {
 // ── GAME STATE ────────────────────────────────────────────────────────────────
 let G = {};
 let msvg, mg, mzoom, mapReady = false;
+let lbScores = null, lbDiff = 'medium', lbMode = 'Map';
 
 // ── UTILITIES ─────────────────────────────────────────────────────────────────
 function show(id) {
@@ -363,13 +364,36 @@ function goHome() {
 
 async function showLB() {
   show('leaderboard');
+  updateLBChips();
   document.getElementById('lbt').innerHTML = '<div class="lbe">Loading…</div>';
   try {
     const res = await fetch(API + '/scores');
-    renderLB(res.ok ? await res.json() : null);
+    lbScores = res.ok ? await res.json() : null;
   } catch (e) {
-    renderLB(null);
+    lbScores = null;
   }
+  renderLB();
+}
+
+function setLBDiff(d) {
+  lbDiff = d;
+  updateLBChips();
+  renderLB();
+}
+
+function setLBMode(m) {
+  lbMode = m;
+  updateLBChips();
+  renderLB();
+}
+
+function updateLBChips() {
+  ['easy', 'medium', 'hard'].forEach(d =>
+    document.getElementById(`lbd-${d}`)?.classList.toggle('active', d === lbDiff)
+  );
+  ['Map', 'Type', 'MC', 'Rev'].forEach(m =>
+    document.getElementById(`lbm-${m}`)?.classList.toggle('active', m === lbMode)
+  );
 }
 
 function toast(msg, duration = 2200) {
@@ -493,7 +517,10 @@ async function loadMap() {
   const topo  = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
   const feats = topojson.feature(topo, topo.objects.countries).features;
   msvg = d3.select('#msvg');
-  const proj = d3.geoNaturalEarth1().scale(153).translate([480, 250]);
+  const wrap = document.getElementById('map-wrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  msvg.attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'none');
+  const proj = d3.geoNaturalEarth1().fitSize([W, H], { type: 'Sphere' });
   const path = d3.geoPath().projection(proj);
   mg = msvg.append('g');
   mg.selectAll('path').data(feats).enter().append('path')
@@ -822,22 +849,26 @@ function savePlay() { saveScore(); document.getElementById('rend').classList.rem
 function saveHome() { saveScore(); document.getElementById('rend').classList.remove('show'); showLB(); }
 
 // ── LEADERBOARD ───────────────────────────────────────────────────────────────
-function renderLB(scores) {
+function renderLB() {
   const el = document.getElementById('lbt');
-  if (!scores || !scores.length) {
-    el.innerHTML = '<div class="lbe">' + (!scores ? 'Could not load scores — check your connection.' : 'No scores yet — play a game first!') + '</div>';
+  if (!lbScores) {
+    el.innerHTML = '<div class="lbe">Could not load scores — check your connection.</div>';
+    return;
+  }
+  const filtered = lbScores.filter(s => s.difficulty === lbDiff && s.mode === lbMode);
+  if (!filtered.length) {
+    el.innerHTML = '<div class="lbe">No scores yet for this mode & difficulty!</div>';
     return;
   }
   const medals    = ['🥇','🥈','🥉'];
   const rankClass = i => ['r1','r2','r3'][i] ?? '';
   el.innerHTML =
-    `<div class="lbh"><div>Rank</div><div>Player</div><div>Score</div><div>Mode</div><div>Difficulty</div></div>` +
-    scores.map((s, i) => `<div class="lbr">
+    `<div class="lbh"><div>Rank</div><div>Player</div><div>Score</div><div>Correct</div></div>` +
+    filtered.map((s, i) => `<div class="lbr">
       <div class="lbrank ${rankClass(i)}">${medals[i] ?? '#' + (i + 1)}</div>
       <div class="lbname">${esc(s.name)}</div>
       <div class="lbsc">${s.score}</div>
-      <div class="lbm">${s.mode}</div>
-      <div class="lbd">${s.difficulty}</div>
+      <div class="lbcorr">${s.correct ?? '—'}</div>
     </div>`).join('');
 }
 
