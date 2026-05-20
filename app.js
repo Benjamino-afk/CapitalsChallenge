@@ -519,8 +519,9 @@ async function loadMap() {
   msvg = d3.select('#msvg');
   const wrap = document.getElementById('map-wrap');
   const W = wrap.clientWidth, H = wrap.clientHeight;
-  msvg.attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'none');
-  const proj = d3.geoNaturalEarth1().fitSize([W, H], { type: 'Sphere' });
+  // Scale to fill whichever dimension is larger — no letterboxing, minor clipping in Pacific
+  const scale = Math.max((H / 500) * 153, (W / 960) * 153);
+  const proj = d3.geoNaturalEarth1().scale(scale).translate([W / 2, H / 2]);
   const path = d3.geoPath().projection(proj);
   mg = msvg.append('g');
   mg.selectAll('path').data(feats).enter().append('path')
