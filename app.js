@@ -938,6 +938,14 @@ document.addEventListener('keydown', e => {
 
 updateHomeSettings();
 
+// DEBUG version tag — remove after confirming SW is serving new files
+(function() {
+  const tag = document.createElement('div');
+  tag.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:9999;background:rgba(0,0,0,0.7);color:#ff0;font-size:11px;padding:4px 8px;border-radius:6px;pointer-events:none';
+  tag.textContent = 'v=debug4';
+  document.body.appendChild(tag);
+})();
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 }
