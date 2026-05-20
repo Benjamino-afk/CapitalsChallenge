@@ -23,14 +23,15 @@ jobs:
         run: |
           aws s3 sync . s3://geochallenger-avgchap-com \
             --exclude "*" \
-            --include "app.js" \
-            --include "style.css" \
-            --include "manifest.json" \
-            --include "sw.js" \
-            --include "index.html" \
             --include "icons/*" \
             --delete \
             --cache-control "public,max-age=31536000,immutable"
+          aws s3 cp app.js s3://geochallenger-avgchap-com/app.js \
+            --cache-control "public,max-age=0,must-revalidate"
+          aws s3 cp style.css s3://geochallenger-avgchap-com/style.css \
+            --cache-control "public,max-age=0,must-revalidate"
+          aws s3 cp manifest.json s3://geochallenger-avgchap-com/manifest.json \
+            --cache-control "public,max-age=0,must-revalidate"
           aws s3 cp index.html s3://geochallenger-avgchap-com/index.html \
             --cache-control "public,max-age=0,must-revalidate"
           aws s3 cp sw.js s3://geochallenger-avgchap-com/sw.js \

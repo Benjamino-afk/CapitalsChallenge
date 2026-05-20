@@ -1,11 +1,11 @@
-const STATIC_CACHE = 'capitals-static-v4';
+const STATIC_CACHE = 'capitals-static-v5';
 const CDN_CACHE = 'capitals-cdn-v1';
 
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './style.css',
-  './app.js',
+  './style.css?v=6',
+  './app.js?v=6',
   './manifest.json',
   './icons/icon.svg',
   './icons/icon-192.png',
@@ -16,7 +16,7 @@ const STATIC_ASSETS = [
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(STATIC_CACHE)
-      .then(cache => cache.addAll(STATIC_ASSETS))
+      .then(cache => cache.addAll(STATIC_ASSETS.map(url => new Request(url, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
