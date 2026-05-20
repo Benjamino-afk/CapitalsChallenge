@@ -518,7 +518,10 @@ async function loadMap() {
   const feats = topojson.feature(topo, topo.objects.countries).features;
   msvg = d3.select('#msvg');
   const wrap = document.getElementById('map-wrap');
-  const W = wrap.clientWidth, H = wrap.clientHeight;
+  // Wait for layout to complete — service worker cache can resolve fetch instantly,
+  // before the browser has reflowed the newly-visible flex container
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  const W = wrap.clientWidth, H = wrap.clientHeight || window.innerHeight * 0.7;
   // Scale to fill whichever dimension is larger — no letterboxing, minor clipping in Pacific
   const scale = Math.max((H / 500) * 153, (W / 960) * 153);
   const proj = d3.geoNaturalEarth1().scale(scale).translate([W / 2, H / 2]);

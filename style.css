@@ -294,7 +294,7 @@ button { font-family: inherit; touch-action: manipulation; }
 .timer-bar.danger { background: var(--red); }
 
 /* ── MAP MODE ── */
-#map-game { flex-direction: column; }
+#map-game { flex-direction: column; height: 100dvh; height: 100vh; overflow: hidden; }
 
 #map-qbar {
   background: var(--panel);
