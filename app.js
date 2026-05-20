@@ -524,12 +524,6 @@ async function loadMap() {
   const rect = wrap.getBoundingClientRect();
   const W = rect.width || window.innerWidth;
   const H = rect.height || (window.innerHeight - rect.top);
-  // DEBUG — remove after confirming dimensions are correct
-  const dbg = document.createElement('div');
-  dbg.style.cssText = 'position:fixed;top:60px;left:0;z-index:9999;background:rgba(0,0,0,0.85);color:#ff0;font-size:16px;padding:8px 12px;border-radius:0 8px 8px 0';
-  dbg.textContent = `W=${Math.round(W)} H=${Math.round(H)} cH=${wrap.clientHeight} bH=${Math.round(rect.height)}`;
-  document.body.appendChild(dbg);
-  setTimeout(() => dbg.remove(), 8000);
   // fitSize to get correct base scale, then scale up to fill container (no letterboxing)
   const sphere = { type: 'Sphere' };
   const proj = d3.geoNaturalEarth1().fitSize([W, H], sphere);
@@ -941,13 +935,6 @@ document.addEventListener('keydown', e => {
 
 updateHomeSettings();
 
-// DEBUG version tag — remove after confirming SW is serving new files
-(function() {
-  const tag = document.createElement('div');
-  tag.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:9999;background:rgba(0,0,0,0.7);color:#ff0;font-size:11px;padding:4px 8px;border-radius:6px;pointer-events:none';
-  tag.textContent = 'v=debug7';
-  document.body.appendChild(tag);
-})();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
