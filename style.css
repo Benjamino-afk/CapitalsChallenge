@@ -398,6 +398,15 @@ button { font-family: inherit; touch-action: manipulation; }
 .rl { color: var(--muted); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
 .big-flag { font-size: 44px; display: block; margin-bottom: 6px; }
 
+.flag-img {
+  width: 160px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+  display: block;
+  margin: 0 auto 6px;
+}
+
 .cname {
   font-family: 'Bangers', cursive;
   font-size: clamp(24px, 6vw, 46px);

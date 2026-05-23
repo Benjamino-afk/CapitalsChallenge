@@ -29,7 +29,7 @@ export const handler = async (event) => {
         KeyConditionExpression: 'pk = :pk',
         ExpressionAttributeValues: { ':pk': { S: 'LEADERBOARD' } },
         ScanIndexForward: false,
-        Limit: 20,
+        Limit: 500,
       }));
       return resp(200, (result.Items || []).map(fromDDB));
     }

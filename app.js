@@ -441,7 +441,8 @@ function updHUD(prefix) {
   const $ = id => document.getElementById(id);
   $(prefix + 's').textContent  = G.score;
   $(prefix + 'st').textContent = G.streak + (G.streak >= 3 ? '🔥' : '');
-  $(prefix + 'l').textContent  = '❤️'.repeat(G.lives) + '🖤'.repeat(Math.max(0, LIVES - G.lives));
+  $(prefix + 'l').textContent  = G.lives === Infinity ? '∞'
+    : '❤️'.repeat(G.lives) + '🖤'.repeat(Math.max(0, LIVES - G.lives));
   if (prefix !== 'mc') {
     $(prefix + 'hl').textContent = G.hints;
     $(prefix + 'hb').disabled    = G.hints <= 0 || G.hused;
@@ -496,14 +497,15 @@ function startGame(mode) {
   const questions = shuffle(pool).slice(0, Math.min(QUESTIONS, pool.length));
   G = {
     mode, q: questions, qi: 0,
-    score: 0, lives: LIVES, streak: 0, best: 0,
+    score: 0, lives: settings.difficulty === 'easy' ? Infinity : LIVES,
+    streak: 0, best: 0,
     hints: HINTS, correct: 0, hused: false, done: false,
     missed: [], correctMCIdx: 0
   };
   if (mode === 'map') {
     show('map-game');
     if (!mapReady) loadMap(); else nextMQ();
-  } else if (mode === 'mc') {
+  } else if (mode === 'mc' || (mode === 'flag' && settings.difficulty !== 'hard')) {
     show('mc-game');
     nextMCQ();
   } else {
@@ -639,10 +641,17 @@ function nextTQ() {
   G.done  = false;
   const country = G.q[G.qi];
   const isReverse = G.mode === 'reverse';
-  document.getElementById('type-rl').textContent   = isReverse ? 'Which country has this capital?' : 'What is the capital of…';
-  document.getElementById('tflag').textContent     = isReverse ? '🌍' : country.flag;
-  document.getElementById('tcname').textContent    = isReverse ? country.capital : country.name;
-  document.getElementById('tcsub').textContent     = isReverse ? 'Capital city' : `Region: ${country.region}`;
+  const isFlagType = G.mode === 'flag';
+  document.getElementById('type-rl').textContent = isFlagType ? 'Which country is this flag?'
+    : isReverse ? 'Which country has this capital?' : 'What is the capital of…';
+  const tflagEl = document.getElementById('tflag');
+  if (isFlagType) {
+    tflagEl.innerHTML = flagImgHTML(country.flag, country.name);
+  } else {
+    tflagEl.textContent = isReverse ? '🌍' : country.flag;
+  }
+  document.getElementById('tcname').textContent = isFlagType ? '' : isReverse ? country.capital : country.name;
+  document.getElementById('tcsub').textContent  = isFlagType ? '' : isReverse ? 'Capital city' : `Region: ${country.region}`;
   document.getElementById('type-hint').textContent = '';
   const inp = document.getElementById('type-in');
   inp.value = ''; inp.className = ''; inp.disabled = false;
@@ -665,7 +674,7 @@ function submitType() {
   if (!val) return;
   const country   = G.q[G.qi];
   const isReverse = G.mode === 'reverse';
-  const target    = isReverse ? country.name : country.capital;
+  const target    = (isReverse || G.mode === 'flag') ? country.name : country.capital;
   const correct   = norm(val) === norm(target);
   G.done = true;
   stopTimer();
@@ -706,7 +715,7 @@ function onTI() {
   const val  = document.getElementById('type-in').value.trim().toLowerCase();
   const ac   = document.getElementById('ac');
   if (val.length < 2) { ac.style.display = 'none'; return; }
-  const list = G.mode === 'reverse' ? ALL_NAMES : ALL_CAPITALS;
+  const list = (G.mode === 'reverse' || G.mode === 'flag') ? ALL_NAMES : ALL_CAPITALS;
   const matches = list.filter(x => x.toLowerCase().startsWith(val)).slice(0, 6);
   if (!matches.length) { ac.style.display = 'none'; return; }
   ac.innerHTML = matches.map(v => `<div class="aci" data-val="${esc(v)}">${esc(v)}</div>`).join('');
@@ -720,7 +729,7 @@ function skipType() {
   G.streak = 0;
   const country   = G.q[G.qi];
   const isReverse = G.mode === 'reverse';
-  const target    = isReverse ? country.name : country.capital;
+  const target    = (isReverse || G.mode === 'flag') ? country.name : country.capital;
   G.missed.push(country);
   const inp = document.getElementById('type-in');
   inp.disabled = true;
@@ -740,13 +749,21 @@ function typeHint() {
   G.hints--; G.hused = true;
   const country   = G.q[G.qi];
   const isReverse = G.mode === 'reverse';
-  const target    = isReverse ? country.name : country.capital;
+  const target    = (isReverse || G.mode === 'flag') ? country.name : country.capital;
   const masked    = target.split('').map((ch, i) => i === 0 || ch === ' ' ? ch : '_').join('');
   document.getElementById('type-hint').textContent = `💡 "${masked}" (−${HINT_PEN} pts)`;
   updHUD('t');
 }
 
 // ── MULTIPLE CHOICE MODE ──────────────────────────────────────────────────────
+function flagISO2(emoji) {
+  return [...emoji].map(c => String.fromCharCode(c.codePointAt(0) - 0x1F1E6 + 65)).join('').toLowerCase();
+}
+
+function flagImgHTML(emoji, alt) {
+  return `<img src="https://flagcdn.com/w160/${flagISO2(emoji)}.png" alt="${alt}" class="flag-img">`;
+}
+
 function pickWrongCapitals(correctCapital, country) {
   const pool = DATA.filter(d => d.region === country.region && d.capital !== correctCapital);
   return shuffle(pool).slice(0, 3).map(d => d.capital);
@@ -764,26 +781,42 @@ function nextMCQ() {
   const country = G.q[G.qi];
   const isFlag  = G.mode === 'flag';
 
+  const numChoices = (isFlag && settings.difficulty === 'easy') ? 2 : 4;
+
   document.getElementById('mc-rl').textContent   = isFlag ? 'Which country is this flag?' : 'What is the capital of…';
   const flagEl = document.getElementById('mcflag');
-  flagEl.textContent  = country.flag;
-  flagEl.style.fontSize = isFlag ? '72px' : '';
+  if (isFlag) {
+    flagEl.innerHTML  = flagImgHTML(country.flag, country.name);
+    flagEl.style.fontSize = '';
+  } else {
+    flagEl.textContent    = country.flag;
+    flagEl.style.fontSize = '';
+  }
   document.getElementById('mccname').textContent = isFlag ? '' : country.name;
   document.getElementById('mccsub').textContent  = isFlag ? '' : `Region: ${country.region}`;
   document.getElementById('mcq').textContent     = `${G.qi + 1}/${G.q.length}`;
   document.getElementById('mcprog').style.width  = `${(G.qi / G.q.length) * 100}%`;
 
-  const choices = isFlag
-    ? shuffle([country.name,    ...pickWrongCountries(country.name, country)])
-    : shuffle([country.capital, ...pickWrongCapitals(country.capital, country)]);
+  const wrongs  = isFlag
+    ? pickWrongCountries(country.name, country).slice(0, numChoices - 1)
+    : pickWrongCapitals(country.capital, country);
   const correct = isFlag ? country.name : country.capital;
-  G.correctMCIdx = choices.indexOf(correct);
-  choices.forEach((item, i) => {
+  const allChoices = isFlag
+    ? shuffle([country.name, ...wrongs])
+    : shuffle([country.capital, ...wrongs]);
+  G.correctMCIdx = allChoices.indexOf(correct);
+
+  for (let i = 0; i < 4; i++) {
     const btn = document.getElementById('mc' + i);
-    btn.textContent = `${i + 1}.  ${item}`;
-    btn.className   = 'mc-choice';
-    btn.disabled    = false;
-  });
+    if (i < numChoices) {
+      btn.textContent   = `${i + 1}.  ${allChoices[i]}`;
+      btn.className     = 'mc-choice';
+      btn.disabled      = false;
+      btn.style.display = '';
+    } else {
+      btn.style.display = 'none';
+    }
+  }
   document.getElementById('mc-skip').disabled = false;
   updHUD('mc');
   if (settings.timed && settings.difficulty !== 'easy') startTimer('mc-timer', 'mc-timer-wrap', TIMER_SECS[settings.difficulty], skipMC);
