@@ -269,10 +269,13 @@ try { const s = JSON.parse(localStorage.getItem('geo_settings')); if (s) Object.
 function saveSettings() { localStorage.setItem('geo_settings', JSON.stringify(settings)); }
 
 function getPool() {
-  let pool = settings.region !== 'all' ? DATA.filter(c => c.region === settings.region) : [...DATA];
+  const regionPool = settings.region !== 'all' ? DATA.filter(c => c.region === settings.region) : [...DATA];
+  let pool = [...regionPool];
   if (settings.difficulty === 'easy')        pool = pool.filter(c => EASY_COUNTRIES.has(c.name));
   else if (settings.difficulty === 'medium') pool = pool.filter(c => MEDIUM_COUNTRIES.has(c.name));
-  return pool.length >= 4 ? pool : [...DATA];
+  // Fall back within region first, then all data as last resort
+  if (pool.length < 4) pool = regionPool.length >= 4 ? regionPool : [...DATA];
+  return pool;
 }
 
 // ── SFX ───────────────────────────────────────────────────────────────────────
