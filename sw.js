@@ -1,11 +1,11 @@
-const STATIC_CACHE = 'capitals-static-v8';
+const STATIC_CACHE = 'capitals-static-v9';
 const CDN_CACHE = 'capitals-cdn-v1';
 
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './style.css?v=10',
-  './app.js?v=10',
+  './style.css?v=11',
+  './app.js?v=11',
   './manifest.json',
   './icons/icon.svg',
   './icons/icon-192.png',

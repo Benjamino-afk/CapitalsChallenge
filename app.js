@@ -764,7 +764,9 @@ function flagISO2(emoji) {
 }
 
 function flagImgHTML(emoji, alt) {
-  return `<img src="https://flagcdn.com/w160/${flagISO2(emoji)}.png" alt="${alt}" class="flag-img">`;
+  const iso = flagISO2(emoji);
+  const esc = alt.replace(/"/g, '&quot;');
+  return `<img src="https://flagcdn.com/w160/${iso}.png" alt="${esc}" class="flag-img" onerror="this.style.display='none';this.parentElement.textContent='${emoji}'">`;
 }
 
 function pickWrongCapitals(correctCapital, country) {
@@ -827,11 +829,15 @@ function nextMCQ() {
 
 function handleMCAnswer(idx) {
   if (G.done) return;
+  // Reject clicks on hidden buttons (e.g. keyboard shortcut 3/4 in 2-choice easy mode)
+  const clickedBtn = document.getElementById('mc' + idx);
+  if (!clickedBtn || clickedBtn.style.display === 'none') return;
   G.done = true;
   stopTimer();
   const country = G.q[G.qi];
   for (let i = 0; i < 4; i++) document.getElementById('mc' + i).disabled = true;
-  document.getElementById('mc' + G.correctMCIdx).classList.add('correct');
+  const correctBtn = document.getElementById('mc' + G.correctMCIdx);
+  if (correctBtn) correctBtn.classList.add('correct');
   if (idx === G.correctMCIdx) {
     const streakBonus = G.streak >= 3 ? STREAK_BONUS : 0;
     const pts = Math.max(10, BASE_PTS + streakBonus);
@@ -839,7 +845,7 @@ function handleMCAnswer(idx) {
     if (G.streak > G.best) G.best = G.streak;
     playSFX(true);
   } else {
-    document.getElementById('mc' + idx).classList.add('wrong');
+    clickedBtn.classList.add('wrong');
     G.missed.push(country);
     G.streak = 0; G.lives--;
     playSFX(false);
@@ -858,7 +864,8 @@ function skipMC() {
   G.streak = 0;
   G.missed.push(G.q[G.qi]);
   for (let i = 0; i < 4; i++) document.getElementById('mc' + i).disabled = true;
-  document.getElementById('mc' + G.correctMCIdx).classList.add('correct');
+  const correctBtn = document.getElementById('mc' + G.correctMCIdx);
+  if (correctBtn) correctBtn.classList.add('correct');
   document.getElementById('mc-skip').disabled = true;
   updHUD('mc');
   setTimeout(() => { G.qi++; nextMCQ(); }, 1500);
