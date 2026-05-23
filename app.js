@@ -524,12 +524,8 @@ async function loadMap() {
   const rect = wrap.getBoundingClientRect();
   const W = rect.width || window.innerWidth;
   const H = rect.height || (window.innerHeight - rect.top);
-  // fitSize to get correct base scale, then scale up to fill container (no letterboxing)
   const sphere = { type: 'Sphere' };
   const proj = d3.geoNaturalEarth1().fitSize([W, H], sphere);
-  const [[x0, y0], [x1, y1]] = d3.geoPath().projection(proj).bounds(sphere);
-  const fill = Math.max(W / (x1 - x0), H / (y1 - y0));
-  proj.scale(proj.scale() * fill).translate([W / 2, H / 2]);
   const path = d3.geoPath().projection(proj);
   mg = msvg.append('g');
   mg.selectAll('path').data(feats).enter().append('path')
@@ -537,7 +533,11 @@ async function loadMap() {
     .attr('data-iso', d => +d.id)
     .attr('d', path)
     .on('click', function(_, d) { handleMapClick(+d.id, this); });
-  mzoom = d3.zoom().scaleExtent([1, 8]).on('zoom', e => mg.attr('transform', e.transform));
+  mzoom = d3.zoom()
+    .scaleExtent([1, 8])
+    .translateExtent([[0, 0], [W, H]])
+    .extent([[0, 0], [W, H]])
+    .on('zoom', e => mg.attr('transform', e.transform));
   msvg.call(mzoom);
   mapReady = true;
   nextMQ();
