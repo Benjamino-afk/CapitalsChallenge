@@ -391,7 +391,7 @@ function updateLBChips() {
   ['easy', 'medium', 'hard'].forEach(d =>
     document.getElementById(`lbd-${d}`)?.classList.toggle('active', d === lbDiff)
   );
-  ['Map', 'Type', 'MC', 'Rev'].forEach(m =>
+  ['Map', 'Type', 'MC', 'Rev', 'Flag'].forEach(m =>
     document.getElementById(`lbm-${m}`)?.classList.toggle('active', m === lbMode)
   );
 }
@@ -452,7 +452,7 @@ function updHUD(prefix) {
 const API = 'https://7bk6medhc2.execute-api.ap-southeast-2.amazonaws.com';
 
 const DIFF_DESC = {
-  easy:   'Famous capitals only · 30s timer · great for beginners',
+  easy:   'Famous capitals only · no timer · great for beginners',
   medium: 'Broader mix of countries · 20s timer',
   hard:   'All 185 countries · 12s timer · no mercy',
 };
@@ -554,7 +554,7 @@ function nextMQ() {
   d3.selectAll('.cp').classed('cf', false).classed('wf', false).classed('tr', false);
   document.getElementById('map-skip').disabled = false;
   updHUD('m');
-  if (settings.timed) startTimer('map-timer', 'map-timer-wrap', TIMER_SECS[settings.difficulty], skipMap);
+  if (settings.timed && settings.difficulty !== 'easy') startTimer('map-timer', 'map-timer-wrap', TIMER_SECS[settings.difficulty], skipMap);
 }
 
 function handleMapClick(clickedIso, el) {
@@ -655,7 +655,7 @@ function nextTQ() {
   document.getElementById('type-skip').disabled  = false;
   updHUD('t');
   setTimeout(() => inp.focus(), 50);
-  if (settings.timed) startTimer('type-timer', 'type-timer-wrap', TIMER_SECS[settings.difficulty], skipType);
+  if (settings.timed && settings.difficulty !== 'easy') startTimer('type-timer', 'type-timer-wrap', TIMER_SECS[settings.difficulty], skipType);
 }
 
 function submitType() {
@@ -752,27 +752,41 @@ function pickWrongCapitals(correctCapital, country) {
   return shuffle(pool).slice(0, 3).map(d => d.capital);
 }
 
+function pickWrongCountries(correctName, country) {
+  let pool = DATA.filter(d => d.region === country.region && d.name !== correctName);
+  if (pool.length < 3) pool = DATA.filter(d => d.name !== correctName);
+  return shuffle(pool).slice(0, 3).map(d => d.name);
+}
+
 function nextMCQ() {
   if (G.qi >= G.q.length || G.lives <= 0) { endGame(); return; }
   G.done = false;
   const country = G.q[G.qi];
-  document.getElementById('mcflag').textContent  = country.flag;
-  document.getElementById('mccname').textContent = country.name;
-  document.getElementById('mccsub').textContent  = `Region: ${country.region}`;
+  const isFlag  = G.mode === 'flag';
+
+  document.getElementById('mc-rl').textContent   = isFlag ? 'Which country is this flag?' : 'What is the capital of…';
+  const flagEl = document.getElementById('mcflag');
+  flagEl.textContent  = country.flag;
+  flagEl.style.fontSize = isFlag ? '72px' : '';
+  document.getElementById('mccname').textContent = isFlag ? '' : country.name;
+  document.getElementById('mccsub').textContent  = isFlag ? '' : `Region: ${country.region}`;
   document.getElementById('mcq').textContent     = `${G.qi + 1}/${G.q.length}`;
   document.getElementById('mcprog').style.width  = `${(G.qi / G.q.length) * 100}%`;
 
-  const choices = shuffle([country.capital, ...pickWrongCapitals(country.capital, country)]);
-  G.correctMCIdx = choices.indexOf(country.capital);
-  choices.forEach((capital, i) => {
+  const choices = isFlag
+    ? shuffle([country.name,    ...pickWrongCountries(country.name, country)])
+    : shuffle([country.capital, ...pickWrongCapitals(country.capital, country)]);
+  const correct = isFlag ? country.name : country.capital;
+  G.correctMCIdx = choices.indexOf(correct);
+  choices.forEach((item, i) => {
     const btn = document.getElementById('mc' + i);
-    btn.textContent = `${i + 1}.  ${capital}`;
+    btn.textContent = `${i + 1}.  ${item}`;
     btn.className   = 'mc-choice';
     btn.disabled    = false;
   });
   document.getElementById('mc-skip').disabled = false;
   updHUD('mc');
-  if (settings.timed) startTimer('mc-timer', 'mc-timer-wrap', TIMER_SECS[settings.difficulty], skipMC);
+  if (settings.timed && settings.difficulty !== 'easy') startTimer('mc-timer', 'mc-timer-wrap', TIMER_SECS[settings.difficulty], skipMC);
 }
 
 function handleMCAnswer(idx) {
@@ -832,7 +846,7 @@ function renderReview() {
 
 function endGame() {
   stopTimer();
-  const modeLabels = { map: '🗺️ Map', type: '⌨️ Type', mc: '🔤 MC', reverse: '🔄 Rev' };
+  const modeLabels = { map: '🗺️ Map', type: '⌨️ Type', mc: '🔤 MC', reverse: '🔄 Rev', flag: '🚩 Flag' };
   document.getElementById('etitle').textContent = G.lives <= 0 ? '💀 GAME OVER!' : '🎉 COMPLETE!';
   document.getElementById('escore').textContent = G.score;
   document.getElementById('ecorr').textContent  = `${G.correct}/${G.q.length}`;
@@ -844,7 +858,7 @@ function endGame() {
 
 function saveScore() {
   const name      = document.getElementById('pname').value.trim() || 'Anonymous';
-  const modeNames = { map: 'Map', type: 'Type', mc: 'MC', reverse: 'Rev' };
+  const modeNames = { map: 'Map', type: 'Type', mc: 'MC', reverse: 'Rev', flag: 'Flag' };
   const mode      = modeNames[G.mode] || G.mode;
   fetch(API + '/scores', {
     method: 'POST',

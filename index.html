@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Capitals">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 
@@ -20,33 +20,39 @@
   <div class="logo">GeoChallenge</div>
   <div class="tagline">🌍 How well do you know the world?</div>
 
-  <div class="settings-panel">
-    <div class="setting-row">
-      <span class="setting-label">DIFFICULTY</span>
-      <div class="chips">
-        <button class="chip" id="diff-easy"   onclick="setDiff('easy')">Easy</button>
-        <button class="chip active" id="diff-medium" onclick="setDiff('medium')">Medium</button>
-        <button class="chip" id="diff-hard"   onclick="setDiff('hard')">Hard</button>
+  <div class="settings-with-actions">
+    <div class="settings-panel">
+      <div class="setting-row">
+        <span class="setting-label">DIFFICULTY</span>
+        <div class="chips">
+          <button class="chip" id="diff-easy"   onclick="setDiff('easy')">Easy</button>
+          <button class="chip active" id="diff-medium" onclick="setDiff('medium')">Medium</button>
+          <button class="chip" id="diff-hard"   onclick="setDiff('hard')">Hard</button>
+        </div>
+      </div>
+      <div id="diff-desc" class="diff-desc"></div>
+      <div class="setting-row">
+        <span class="setting-label">REGION</span>
+        <select class="setting-sel" id="region-sel" onchange="setRegion(this.value)">
+          <option value="all">All regions</option>
+          <option value="Africa">Africa</option>
+          <option value="Americas">Americas</option>
+          <option value="Asia">Asia</option>
+          <option value="Europe">Europe</option>
+          <option value="Oceania">Oceania</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">OPTIONS</span>
+        <div class="chips">
+          <button class="chip" id="timer-chip" onclick="toggleTimer()">⏱ Timer</button>
+          <button class="chip active" id="sound-chip" onclick="toggleSound()">🔊 Sound</button>
+        </div>
       </div>
     </div>
-    <div id="diff-desc" class="diff-desc"></div>
-    <div class="setting-row">
-      <span class="setting-label">REGION</span>
-      <select class="setting-sel" id="region-sel" onchange="setRegion(this.value)">
-        <option value="all">All regions</option>
-        <option value="Africa">Africa</option>
-        <option value="Americas">Americas</option>
-        <option value="Asia">Asia</option>
-        <option value="Europe">Europe</option>
-        <option value="Oceania">Oceania</option>
-      </select>
-    </div>
-    <div class="setting-row">
-      <span class="setting-label">OPTIONS</span>
-      <div class="chips">
-        <button class="chip" id="timer-chip" onclick="toggleTimer()">⏱ Timer</button>
-        <button class="chip active" id="sound-chip" onclick="toggleSound()">🔊 Sound</button>
-      </div>
+    <div class="home-btns">
+      <button class="lb-btn" onclick="showStudy()">📚 Study</button>
+      <button class="lb-btn" onclick="showLB()">🏆 Leaderboard</button>
     </div>
   </div>
 
@@ -71,11 +77,11 @@
       <h2>Reverse</h2>
       <p>Given the capital — name the country</p>
     </div>
-  </div>
-
-  <div class="home-btns">
-    <button class="lb-btn" onclick="showStudy()">📚 Study</button>
-    <button class="lb-btn" onclick="showLB()">🏆 Leaderboard</button>
+    <div class="mode-card flag-mode" onclick="startGame('flag')">
+      <div class="mode-icon">🚩</div>
+      <h2>Flag Quiz</h2>
+      <p>Identify the country from its flag</p>
+    </div>
   </div>
 </div>
 
@@ -159,7 +165,7 @@
     <div class="timer-bar" id="mc-timer" style="width:100%"></div>
   </div>
   <div id="mc-card">
-    <div class="rl">What is the capital of…</div>
+    <div class="rl" id="mc-rl">What is the capital of…</div>
     <span class="big-flag" id="mcflag">🌍</span>
     <div class="cname" id="mccname">—</div>
     <div class="csub" id="mccsub"></div>
@@ -232,6 +238,7 @@
       <button class="lb-chip" id="lbm-Type" onclick="setLBMode('Type')">⌨️ Type</button>
       <button class="lb-chip" id="lbm-MC"   onclick="setLBMode('MC')">🔤 MC</button>
       <button class="lb-chip" id="lbm-Rev"  onclick="setLBMode('Rev')">🔄 Reverse</button>
+      <button class="lb-chip" id="lbm-Flag" onclick="setLBMode('Flag')">🚩 Flag</button>
     </div>
   </div>
   <div id="lbt"></div>
@@ -244,6 +251,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-<script src="app.js?v=8"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

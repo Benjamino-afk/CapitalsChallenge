@@ -71,18 +71,34 @@ button { font-family: inherit; touch-action: manipulation; }
   text-transform: uppercase;
 }
 
+/* ── SETTINGS + ACTION BUTTONS WRAPPER ── */
+.settings-with-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 16px;
+}
+
 /* ── SETTINGS PANEL ── */
 .settings-panel {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 100%;
-  max-width: 480px;
-  margin-bottom: 16px;
+  flex: 1;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 12px 14px;
+}
+
+.settings-with-actions .home-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .setting-row {
@@ -165,6 +181,8 @@ button { font-family: inherit; touch-action: manipulation; }
 .mode-card.type-mode:hover { border-color: var(--blue);   box-shadow: 0 0 18px #3498db40; transform: translateY(-3px); }
 .mode-card.mc-mode:hover   { border-color: var(--green);  box-shadow: 0 0 18px #2ecc7140; transform: translateY(-3px); }
 .mode-card.rev-mode:hover  { border-color: var(--purple); box-shadow: 0 0 18px #9b59b640; transform: translateY(-3px); }
+.mode-card.flag-mode:hover { border-color: var(--gold);   box-shadow: 0 0 18px #ffd70040; transform: translateY(-3px); }
+.mode-card.flag-mode { grid-column: 1 / -1; }
 
 .mode-card .mode-icon { font-size: 30px; margin-bottom: 6px; }
 .mode-card h2 { font-family: 'Bangers', cursive; font-size: 17px; letter-spacing: 1px; margin-bottom: 3px; }
@@ -172,6 +190,7 @@ button { font-family: inherit; touch-action: manipulation; }
 .mode-card.type-mode h2 { color: var(--blue); }
 .mode-card.mc-mode h2   { color: var(--green); }
 .mode-card.rev-mode h2  { color: var(--purple); }
+.mode-card.flag-mode h2 { color: var(--gold); }
 .mode-card p { color: var(--muted); font-size: 11px; line-height: 1.4; }
 
 .home-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
@@ -180,13 +199,14 @@ button { font-family: inherit; touch-action: manipulation; }
   background: transparent;
   border: 2px solid var(--gold);
   color: var(--gold);
-  padding: 10px 22px;
+  padding: 10px 14px;
   border-radius: 30px;
   font-family: 'Bangers', cursive;
-  font-size: 17px;
-  letter-spacing: 2px;
+  font-size: 15px;
+  letter-spacing: 1.5px;
   cursor: pointer;
   min-height: 46px;
+  white-space: nowrap;
   transition: background 0.2s, color 0.2s;
 }
 
@@ -199,7 +219,7 @@ button { font-family: inherit; touch-action: manipulation; }
   .mode-card h2 { font-size: 20px; }
   .mode-card p { font-size: 12px; }
   .tagline { font-size: 13px; margin-bottom: 18px; }
-  .settings-panel { max-width: 540px; }
+  .settings-with-actions { max-width: 540px; }
 }
 
 /* ── GAME HEADER ── */
