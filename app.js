@@ -363,6 +363,8 @@ let lbScores = null, lbDiff = 'medium', lbMode = 'Map';
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  const hashes = { home: '#home', leaderboard: '#leaderboard', study: '#study', 'map-game': '#map', 'type-game': '#type', 'mc-game': '#mc' };
+  if (hashes[id]) history.pushState(null, '', hashes[id]);
 }
 
 function goHome() {
@@ -436,11 +438,20 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Shows a toast at streak milestones. Returns true if milestone was hit.
+function showStreakBurst(streak) {
+  const el = document.getElementById('streak-burst');
+  el.textContent = streak >= 10 ? `⚡ ${streak} STREAK!` : '🔥 5 STREAK!';
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+
+// Shows a toast + visual burst at streak milestones. Returns true if milestone was hit.
 function checkStreakMilestone() {
   const s = G.streak;
   if (s === 5 || s === 10 || (s > 10 && s % 10 === 0)) {
     toast(s === 5 ? '🔥 5 STREAK!' : `⚡ ${s} STREAK!`, 1500);
+    showStreakBurst(s);
     return true;
   }
   return false;
@@ -531,7 +542,28 @@ function startGame(mode) {
 }
 
 // ── MAP MODE ──────────────────────────────────────────────────────────────────
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
 async function loadMap() {
+  if (!window.d3) {
+    document.getElementById('mqt').textContent = 'Loading…';
+    document.getElementById('mqh').textContent = '';
+    try {
+      await Promise.all([
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js'),
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js')
+      ]);
+    } catch (e) {
+      document.getElementById('mqt').textContent = 'Failed to load map — check connection';
+      return;
+    }
+  }
   const topo  = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
   const feats = topojson.feature(topo, topo.objects.countries).features;
   msvg = d3.select('#msvg');
@@ -1003,8 +1035,25 @@ document.addEventListener('keydown', e => {
   if (idx !== -1) handleMCAnswer(idx);
 });
 
-updateHomeSettings();
+// ── ROUTING ───────────────────────────────────────────────────────────────────
+window.addEventListener('popstate', () => {
+  const hash = location.hash;
+  if (hash === '#leaderboard') { showLB(); return; }
+  if (hash === '#study') { showStudy(); return; }
+  stopTimer();
+  document.getElementById('rend').classList.remove('show');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('home').classList.add('active');
+  updateHomeSettings();
+});
 
+(function init() {
+  const hash = location.hash;
+  if (hash === '#leaderboard') { showLB(); return; }
+  if (hash === '#study') { showStudy(); return; }
+  updateHomeSettings();
+  history.replaceState(null, '', '#home');
+})();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));

@@ -185,6 +185,12 @@ button { font-family: inherit; touch-action: manipulation; }
 .mode-card.flag-mode { grid-column: 1 / -1; max-width: calc(50% - 5px); margin: 0 auto; }
 
 .mode-card .mode-icon { font-size: 30px; margin-bottom: 6px; }
+.mode-card .mode-icon svg { width: 36px; height: 36px; display: block; margin: 0 auto; }
+.mode-card.map-mode  .mode-icon { color: var(--accent); }
+.mode-card.type-mode .mode-icon { color: var(--blue); }
+.mode-card.mc-mode   .mode-icon { color: var(--green); }
+.mode-card.rev-mode  .mode-icon { color: var(--purple); }
+.mode-card.flag-mode .mode-icon { color: var(--gold); }
 .mode-card h2 { font-family: 'Bangers', cursive; font-size: 17px; letter-spacing: 1px; margin-bottom: 3px; }
 .mode-card.map-mode h2  { color: var(--accent); }
 .mode-card.type-mode h2 { color: var(--blue); }
@@ -216,6 +222,7 @@ button { font-family: inherit; touch-action: manipulation; }
   .mode-cards { max-width: 540px; gap: 14px; }
   .mode-card { padding: 22px 18px; }
   .mode-card .mode-icon { font-size: 38px; margin-bottom: 8px; }
+  .mode-card .mode-icon svg { width: 44px; height: 44px; }
   .mode-card h2 { font-size: 20px; }
   .mode-card p { font-size: 12px; }
   .tagline { font-size: 13px; margin-bottom: 18px; }
@@ -950,6 +957,32 @@ button { font-family: inherit; touch-action: manipulation; }
 
 #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+/* ── STREAK BURST ── */
+#streak-burst {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bangers', cursive;
+  font-size: clamp(40px, 10vw, 80px);
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-shadow: 0 0 20px var(--gold), 0 0 40px var(--accent);
+  opacity: 0;
+}
+
+@keyframes streakPop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  35%  { opacity: 1; transform: scale(1.1); }
+  65%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+
+#streak-burst.pop { animation: streakPop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
 /* ── FOCUS RINGS ── */
 :focus-visible {
   outline: 2px solid var(--blue);
@@ -983,4 +1016,5 @@ button { font-family: inherit; touch-action: manipulation; }
   .ec   { animation: none; }
   #type-in.bad { animation: none; }
   .lbe-loading::after { animation: none; }
+  #streak-burst.pop { animation: none; }
 }
