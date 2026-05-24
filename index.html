@@ -219,10 +219,24 @@
       <div class="review-title">Revisit these</div>
       <div id="review-list"></div>
     </div>
-    <input id="pname" type="text" placeholder="Your name for the leaderboard" maxlength="20">
-    <div class="ebtns">
-      <button class="ebtn p" onclick="savePlay()">💾 Save &amp; Play Again</button>
-      <button class="ebtn s" onclick="saveHome()">🏆 Leaderboard</button>
+    <div id="rend-step1">
+      <input id="pname" type="text" placeholder="Your name for the leaderboard" maxlength="20">
+      <div class="ebtns">
+        <button class="ebtn p" onclick="submitLB()">💾 Save to Leaderboard</button>
+        <button class="ebtn s" onclick="skipLB()">Skip</button>
+      </div>
+    </div>
+    <div id="rend-step2" style="display:none">
+      <div class="step2-label">Choose difficulty &amp; play again?</div>
+      <div class="chips step2-chips">
+        <button class="chip" id="pa-diff-easy"   onclick="setPADiff('easy')">Easy</button>
+        <button class="chip" id="pa-diff-medium" onclick="setPADiff('medium')">Medium</button>
+        <button class="chip" id="pa-diff-hard"   onclick="setPADiff('hard')">Hard</button>
+      </div>
+      <div class="ebtns">
+        <button class="ebtn p" onclick="playAgain()">▶ Play Again</button>
+        <button class="ebtn s" onclick="goHome()">← Back to Home</button>
+      </div>
     </div>
   </div>
 </div>

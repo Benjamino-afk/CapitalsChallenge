@@ -935,16 +935,23 @@ function renderReview() {
 function endGame() {
   stopTimer();
   const modeLabels = { map: '🗺️ Map', type: '⌨️ Type', mc: '🔤 MC', reverse: '🔄 Rev', flag: '🚩 Flag' };
+  const modeNames  = { map: 'Map', type: 'Type', mc: 'MC', reverse: 'Rev', flag: 'Flag' };
+  // Pre-sync leaderboard filters so opening the LB shows the just-played difficulty/mode
+  lbDiff = settings.difficulty;
+  lbMode = modeNames[G.mode] || G.mode;
   document.getElementById('etitle').textContent = G.lives <= 0 ? '💀 GAME OVER!' : '🎉 COMPLETE!';
   document.getElementById('escore').textContent = G.score;
   document.getElementById('ecorr').textContent  = `${G.correct}/${G.q.length}`;
   document.getElementById('estrk').textContent  = G.best;
   document.getElementById('emode').textContent  = modeLabels[G.mode] || G.mode;
   renderReview();
+  document.getElementById('pname').value = '';
+  document.getElementById('rend-step1').style.display = 'block';
+  document.getElementById('rend-step2').style.display = 'none';
   document.getElementById('rend').classList.add('show');
 }
 
-function saveScore() {
+function submitLB() {
   const name      = document.getElementById('pname').value.trim() || 'Anonymous';
   const modeNames = { map: 'Map', type: 'Type', mc: 'MC', reverse: 'Rev', flag: 'Flag' };
   const mode      = modeNames[G.mode] || G.mode;
@@ -954,10 +961,29 @@ function saveScore() {
     body: JSON.stringify({ name, score: G.score, mode, correct: G.correct, streak: G.best, difficulty: settings.difficulty }),
   }).catch(() => {});
   toast('Score saved! 🏆');
+  showStep2();
 }
 
-function savePlay() { saveScore(); document.getElementById('rend').classList.remove('show'); startGame(G.mode); }
-function saveHome() { saveScore(); document.getElementById('rend').classList.remove('show'); showLB(); }
+function skipLB() { showStep2(); }
+
+function showStep2() {
+  document.getElementById('rend-step1').style.display = 'none';
+  document.getElementById('rend-step2').style.display = 'block';
+  setPADiff(settings.difficulty);
+}
+
+function setPADiff(d) {
+  ['easy','medium','hard'].forEach(v =>
+    document.getElementById('pa-diff-' + v).classList.toggle('active', v === d)
+  );
+  settings.difficulty = d;
+  saveSettings();
+}
+
+function playAgain() {
+  document.getElementById('rend').classList.remove('show');
+  startGame(G.mode);
+}
 
 // ── LEADERBOARD ───────────────────────────────────────────────────────────────
 function renderLB() {
