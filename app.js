@@ -319,16 +319,19 @@ let timerRAF = null, timerGen = 0;
 
 function startTimer(barId, wrapId, seconds, onExpire) {
   stopTimer();
-  const gen   = ++timerGen;
-  const total = seconds * 1000;
-  const end   = performance.now() + total;
-  document.getElementById(wrapId).style.display = 'block';
+  const gen    = ++timerGen;
+  const total  = seconds * 1000;
+  const end    = performance.now() + total;
+  const wrapEl = document.getElementById(wrapId);
+  wrapEl.style.display = 'flex';
+  const valEl  = wrapEl.querySelector('.timer-val');
 
   function tick(now) {
     if (timerGen !== gen) return;
     const rem = end - now;
     if (rem <= 0) {
       document.getElementById(barId).style.width = '0%';
+      if (valEl) { valEl.textContent = '0s'; valEl.style.color = 'var(--red)'; }
       if (onExpire) onExpire();
       return;
     }
@@ -336,6 +339,10 @@ function startTimer(barId, wrapId, seconds, onExpire) {
     const bar = document.getElementById(barId);
     bar.style.width = pct + '%';
     bar.className = 'timer-bar' + (pct < 25 ? ' danger' : pct < 50 ? ' warn' : '');
+    if (valEl) {
+      valEl.textContent = Math.ceil(rem / 1000) + 's';
+      valEl.style.color = pct < 25 ? 'var(--red)' : pct < 50 ? 'var(--gold)' : 'var(--muted)';
+    }
     timerRAF = requestAnimationFrame(tick);
   }
   timerRAF = requestAnimationFrame(tick);
@@ -359,6 +366,12 @@ function show(id) {
 }
 
 function goHome() {
+  const active = document.querySelector('.screen.active');
+  const isGameScreen = active && ['map-game', 'type-game', 'mc-game'].includes(active.id);
+  const isEndScreen = document.getElementById('rend').classList.contains('show');
+  if (isGameScreen && !isEndScreen && G.q) {
+    if (!confirm('Leave game? Your progress will be lost.')) return;
+  }
   stopTimer();
   document.getElementById('rend').classList.remove('show');
   show('home');
@@ -368,7 +381,7 @@ function goHome() {
 async function showLB() {
   show('leaderboard');
   updateLBChips();
-  document.getElementById('lbt').innerHTML = '<div class="lbe">Loading…</div>';
+  document.getElementById('lbt').innerHTML = '<div class="lbe lbe-loading">Loading</div>';
   try {
     const res = await fetch(API + '/scores');
     lbScores = res.ok ? await res.json() : null;

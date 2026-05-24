@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Capitals">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 
@@ -104,7 +104,8 @@
     <button class="skip-btn" id="map-skip" onclick="skipMap()">Skip — show me</button>
   </div>
   <div class="timer-wrap" id="map-timer-wrap" style="display:none">
-    <div class="timer-bar" id="map-timer" style="width:100%"></div>
+    <div class="timer-track"><div class="timer-bar" id="map-timer" style="width:100%"></div></div>
+    <span class="timer-val"></span>
   </div>
   <div id="map-wrap">
     <svg id="msvg"></svg>
@@ -128,7 +129,8 @@
     <div class="prog-bar" id="tprog" style="width:0%"></div>
   </div>
   <div class="timer-wrap" id="type-timer-wrap" style="display:none">
-    <div class="timer-bar" id="type-timer" style="width:100%"></div>
+    <div class="timer-track"><div class="timer-bar" id="type-timer" style="width:100%"></div></div>
+    <span class="timer-val"></span>
   </div>
   <div id="type-card">
     <div id="type-rl" class="rl">What is the capital of…</div>
@@ -162,7 +164,8 @@
     <div class="prog-bar" id="mcprog" style="width:0%"></div>
   </div>
   <div class="timer-wrap" id="mc-timer-wrap" style="display:none">
-    <div class="timer-bar" id="mc-timer" style="width:100%"></div>
+    <div class="timer-track"><div class="timer-bar" id="mc-timer" style="width:100%"></div></div>
+    <span class="timer-val"></span>
   </div>
   <div id="mc-card">
     <div class="rl" id="mc-rl">What is the capital of…</div>
@@ -247,10 +250,10 @@
   </div>
 </div>
 
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-<script src="app.js?v=11"></script>
+<script src="app.js?v=12"></script>
 </body>
 </html>
