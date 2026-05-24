@@ -380,12 +380,10 @@ function goHome() {
   updateHomeSettings();
 }
 
-async function showLB() {
-  show('leaderboard');
-  updateLBChips();
+async function fetchLBScores() {
   document.getElementById('lbt').innerHTML = '<div class="lbe lbe-loading">Loading</div>';
   try {
-    const res = await fetch(API + '/scores');
+    const res = await fetch(`${API}/scores?difficulty=${lbDiff}&mode=${lbMode}`);
     lbScores = res.ok ? await res.json() : null;
   } catch (e) {
     lbScores = null;
@@ -393,16 +391,22 @@ async function showLB() {
   renderLB();
 }
 
+async function showLB() {
+  show('leaderboard');
+  updateLBChips();
+  await fetchLBScores();
+}
+
 function setLBDiff(d) {
   lbDiff = d;
   updateLBChips();
-  renderLB();
+  fetchLBScores();
 }
 
 function setLBMode(m) {
   lbMode = m;
   updateLBChips();
-  renderLB();
+  fetchLBScores();
 }
 
 function updateLBChips() {
@@ -992,8 +996,7 @@ function renderLB() {
     el.innerHTML = '<div class="lbe">Could not load scores — check your connection.</div>';
     return;
   }
-  const filtered = lbScores.filter(s => s.difficulty === lbDiff && s.mode === lbMode);
-  if (!filtered.length) {
+  if (!lbScores.length) {
     el.innerHTML = '<div class="lbe">No scores yet for this mode & difficulty!</div>';
     return;
   }
@@ -1001,7 +1004,7 @@ function renderLB() {
   const rankClass = i => ['r1','r2','r3'][i] ?? '';
   el.innerHTML =
     `<div class="lbh"><div>Rank</div><div>Player</div><div>Score</div><div>Correct</div></div>` +
-    filtered.map((s, i) => `<div class="lbr">
+    lbScores.map((s, i) => `<div class="lbr">
       <div class="lbrank ${rankClass(i)}">${medals[i] ?? '#' + (i + 1)}</div>
       <div class="lbname">${esc(s.name)}</div>
       <div class="lbsc">${s.score}</div>
