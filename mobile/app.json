@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "GeoChallenger",
+    "slug": "geochallenger",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon-512.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0f0e17",
+    "splash": {
+      "image": "./assets/icon-512.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f0e17"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.avgchap.geochallenger"
+    },
+    "android": {
+      "package": "com.avgchap.geochallenger",
+      "adaptiveIcon": {
+        "backgroundColor": "#0f0e17",
+        "foregroundImage": "./assets/icon-512.png"
+      }
+    },
+    "plugins": [
+      "expo-audio"
+    ]
+  }
+}
